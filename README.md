@@ -1,6 +1,7 @@
 ### **Calculator of total money of coins in Turkish currency.**
 
 > **1.Introduction**
+
 -> The main goal of the project is coin detection and calculating the total amount of money 
 in the given input image. I followed some steps to detect the coins which are 
 preprocessing of the image that includes edge detection, binarizing, morphological operations, 
@@ -13,6 +14,7 @@ we put the coin values on that ranges with some adjustment. Furthermore, we indi
 results on GUI application.GUI application is created by APP Designer.
 
 > **2.Preprocessing and Analyzing Image**
+
 -> To detect the coins we need some processes on the image.These processes are important 
 because we need background and foreground relative to detect coins. These processes
 includes grayscaling the image, edge detection, binarizing and morphological operations.
@@ -20,6 +22,7 @@ includes grayscaling the image, edge detection, binarizing and morphological ope
 ![image](https://github.com/IsaErayy/Calculation-Total-Money-of-Turkis-Coins-with-MATLAB/assets/162883392/aa2d684e-2d8b-401e-9fdf-e5391c8a8887)
 
 > **3.Plotting Image Results**
+
 -> The result image after image prepropcessing.  
 
 ![image](https://github.com/IsaErayy/Calculation-Total-Money-of-Turkis-Coins-with-MATLAB/assets/162883392/34760a47-6b34-45d5-82b4-18f9668bb167)
@@ -29,6 +32,7 @@ includes grayscaling the image, edge detection, binarizing and morphological ope
 ![image](https://github.com/IsaErayy/Calculation-Total-Money-of-Turkis-Coins-with-MATLAB/assets/162883392/70aeb4fe-12ab-4cd1-9944-d18d69e3f709)
 
 > **4.GUI Application Interface**
+
 -> GUI Application Interface images are shown below.
 
 > > **4.1- GUI applicaiton Interface**
@@ -48,6 +52,7 @@ includes grayscaling the image, edge detection, binarizing and morphological ope
 ![image](https://github.com/IsaErayy/Calculation-Total-Money-of-Turkis-Coins-with-MATLAB/assets/162883392/0829bc81-5958-48d3-a7fc-5bd4bc64b123)
 
 > **5. Strong and weak sides of the methods**
+
 > > **Weak Sides**
 > > > 1-) Changes in shadow, brightness and contrast in the background can cause some errors in our output.
 This can happen when using a certain threshold value. For example, we set this threshold value to 0.2,
@@ -60,6 +65,7 @@ To improve suggestions : We can use machine learning to solve this problem. We c
 for image segmentation tasks. We can train a model from a diverse dataset to learn the optimal
 parameters for different types of images. Evolutionary neural networks are particularly effective for
 these tasks.
+
 > > > 2-) Since the difference in area between 0.05 and 0.1 coins is very small, in some pictures 0.05 TL can
 be perceived as 0.1 TL and 0.1 TL as 0.05 TL.Also, the images where 1 TL’s are not in it does not
 work.Because we adjusted the reference point according to the 1 TL’s area.
