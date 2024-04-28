@@ -1,0 +1,604 @@
+classdef ahmetProje < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure               matlab.ui.Figure
+        OPTIONSPanel           matlab.ui.container.Panel
+        ExitButton             matlab.ui.control.Button
+        CalculateButton        matlab.ui.control.Button
+        PreprocessingButton    matlab.ui.control.Button
+        AddanimageButton       matlab.ui.control.Button
+        NumberofthecoinsPanel  matlab.ui.container.Panel
+        numOfbes               matlab.ui.control.TextArea
+        krLabel_7              matlab.ui.control.Label
+        numOfon                matlab.ui.control.TextArea
+        krLabel_6              matlab.ui.control.Label
+        numOfquart             matlab.ui.control.TextArea
+        krLabel_5              matlab.ui.control.Label
+        numOfhalf              matlab.ui.control.TextArea
+        krLabel                matlab.ui.control.Label
+        numofones              matlab.ui.control.TextArea
+        tlLabel                matlab.ui.control.Label
+        COINCALCULATORLabel    matlab.ui.control.Label
+        Panel                  matlab.ui.container.Panel
+        totalMoney             matlab.ui.control.TextArea
+        TotalMoneyLabel        matlab.ui.control.Label
+        UIAxes_3               matlab.ui.control.UIAxes
+        UIAxes_2               matlab.ui.control.UIAxes
+        ContextMenu            matlab.ui.container.ContextMenu
+        Menu                   matlab.ui.container.Menu
+        Menu2                  matlab.ui.container.Menu
+    end
+
+    
+    properties (Access = private)
+        img % Description
+        img2 % Description
+        img3 % Description
+    end
+    
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Button pushed function: AddanimageButton
+        function AddanimageButtonPushed(app, event)
+            [filename, pathname] = uigetfile({'*.*'});
+            if isequal(filename,0)
+                figure(app.UIFigure)
+                return;
+            end
+            figure(app.UIFigure);
+            app.img=imread(fullfile(pathname,filename));
+            imshow(app.img, 'Parent' ,app.UIAxes_2);
+        end
+
+        % Button pushed function: PreprocessingButton
+        function PreprocessingButtonPushed(app, event)
+           % Button pushed function: PREPROCESSINGOFIMAGEButton
+                gray_img=app.img2;
+                gray_img = im2double(rgb2gray(app.img));
+                % Ensure that an image is loaded before proceeding
+                if isempty(gray_img)
+                    msgbox('Please add an image using the "Add Image" button first.', 'Error', 'error');
+                    return;
+                end
+            
+                % Perform image preprocessing on the loaded image (a)
+               
+            
+                % Display the preprocessing results in the same axes (app.UIAxes_2)
+                axes(app.UIAxes_2);
+            
+                % Original Image
+                imshow(app.img, 'Parent', app.UIAxes_2);
+                title(app.UIAxes_2, 'Original Image');
+            
+                % Grayscale Image
+                axes(app.UIAxes_2);
+                imshow(gray_img, 'Parent', app.UIAxes_2);
+                title(app.UIAxes_2, 'Grayscale Image');
+            
+                F2 = [-1 -2 -1; 0 0 0; 1 2 1]; % X gradient mask for Sobel operator
+                F1 = [-1 0 1; -2 0 2; -1 0 1]; % Y gradient mask for Sobel operator
+            
+                % Adjusting the gradient magnitude
+                Gx = conv2(gray_img, F1, 'same');
+                Gy = conv2(gray_img, F2, 'same');
+                grad_magnitude = sqrt(Gx.^2 + Gy.^2);
+            
+                % Adjusting threshold value
+                threshold_value = 0.2;
+                binary_edges = grad_magnitude > threshold_value;
+            
+                % Gradient Magnitude with Sobel Operator
+                axes(app.UIAxes_2);
+                imshow(grad_magnitude, [], 'Parent', app.UIAxes_2);
+                title(app.UIAxes_2, 'Gradient Magnitude with Sobel Operator');
+            
+                % Binary Edges of the Image
+                axes(app.UIAxes_2);
+                imshow(binary_edges, 'Parent', app.UIAxes_2);
+                title(app.UIAxes_2, 'Binary Edges of the Image');
+            
+                img_Bw = imbinarize(double(binary_edges), graythresh(double(binary_edges)));
+            
+                % Binarized Image
+                axes(app.UIAxes_2);
+                imshow(img_Bw, 'Parent', app.UIAxes_2);
+                title(app.UIAxes_2, 'Binarized Image');
+            
+                se1 = strel('disk', 10);
+                se2 = strel('disk', 1);
+                se3 = strel('disk', 12);
+                img_filled = imfill(img_Bw, 'holes');
+            
+                % Binarized Image with Filled Holes
+                axes(app.UIAxes_2);
+                imshow(img_filled, 'Parent', app.UIAxes_2);
+                title(app.UIAxes_2, 'Binarized Image with Filled Holes');
+            
+                img_erode = imerode(img_filled, se3);
+                
+                % Final result of morphological operations
+                axes(app.UIAxes_2);
+                imshow(img_erode, 'Parent', app.UIAxes_2);
+                title(app.UIAxes_2, 'Final result of morphological operations','Color', 'white');
+                
+
+                % Continue with the rest of your preprocessing steps...
+            
+                % Reset the global variable (optional)
+        end
+
+        % Button pushed function: CalculateButton
+        function CalculateButtonPushed(app, event)
+                    gray_img=app.img3;
+                    gray_img =im2double(rgb2gray(app.img));
+
+                    if isempty(gray_img)
+                        % Eğer a değişkeni boşsa, kullanıcıdan resim seçmesini iste
+                        [filename, pathname] = uigetfile('.', 'Pick an Image');
+                        filename = strcat(pathname, filename);
+                        a = imread(filename);
+                        imshow(a, 'Parent', app.UIAxes_2);
+                    end
+                
+                    % Grayscale Image
+                    
+                
+                    F2 = [-1 -2 -1; 0 0 0; 1 2 1]; % X gradient mask for Sobel operator
+                    F1 = [-1 0 1; -2 0 2; -1 0 1]; % Y gradient mask for Sobel operator
+                
+                    % Adjusting the gradient magnitude
+                    Gx = conv2(gray_img, F1, 'same');
+                    Gy = conv2(gray_img, F2, 'same');
+                    grad_magnitude = sqrt(Gx.^2 + Gy.^2);
+                
+                    % Adjusting threshold value
+                    threshold_value = 0.2;
+                    binary_edges = grad_magnitude > threshold_value;
+                
+                    img_Bw = imbinarize(double(binary_edges), graythresh(double(binary_edges)));
+                
+                    se1 = strel('disk', 10);
+                    se2 = strel('disk', 1);
+                    se3 = strel('disk', 12);
+                    img_filled = imfill(img_Bw, 'holes');
+                
+                    img_erode = imerode(img_filled, se3);
+                
+                    % Coin Detection and Value Calculation
+                    [centers, radii] = imfindcircles(img_erode, [10, 150]);
+                
+                    % Calculate and display the area of each circle
+                    circle_areas = pi * radii.^2;
+                
+                    fprintf('Radius of detected circles (in square pixels):\n');
+                    disp(sort(radii, 'descend'));
+                    radii_sorted = sort(radii, 'descend');
+                
+                    % Sort circles by area in descending order
+                    [sorted_areas, sorted_indices] = sort(circle_areas, 'descend');
+                    sorted_centers = centers(sorted_indices, :);
+                    sorted_radii = radii(sorted_indices);
+                
+                    % Display sorted areas
+                    fprintf('Sorted areas of circles (in square pixels):\n');
+                    disp(sorted_areas);
+                
+                    % Convert areas to square meters (1 pixel is assumed to be 1 square meter)
+                    areas_square_meters = sorted_areas;
+                
+                    fprintf('Sorted areas of circles (in square meters):\n');
+                    disp(areas_square_meters);
+                
+                    total_money = 0;
+                
+                    % Find the largest circle (reference circle)
+                    largest_radius = sorted_radii(1);
+                    largest_area = sorted_areas(1);
+                
+                    % Divide areas by the area of the reference circle
+                    scaled_factors = sqrt(sorted_areas / largest_area);
+                    count1=0;
+                    count2=0;
+                    count3=0;
+                    count4=0;
+                    count5=0;
+                    % Create ranges based on the scaled values
+                    for i = 1:length(scaled_factors)
+                        if (scaled_factors(i) == 1) || (scaled_factors(i) > 0.91)
+
+                            total_money = total_money + 1;
+                            count1=count1+1;
+                           
+
+                        elseif ((0.77 < scaled_factors(i)) && (scaled_factors(i) <= 0.91))
+                      
+                            total_money = total_money + 0.5;
+                            count2=count2+1;
+                            
+
+                        elseif ((0.67 < scaled_factors(i)) && (scaled_factors(i) <= 0.77))
+                            total_money = total_money + 0.25;
+                            count3=count3+1;
+                            
+            
+
+                        elseif ((0.5951 < scaled_factors(i)) && (scaled_factors(i) <= 0.67))
+                            total_money = total_money + 0.10;
+                            count4=count4+1;
+                            
+                        elseif ((0 < scaled_factors(i)) && (scaled_factors(i) <= 0.5951))
+                            total_money = total_money + 0.05;
+                            count5=count5+1;
+                           
+                        end
+                    end
+                
+                    fprintf('Scaled factors:\n');
+                    disp(scaled_factors);
+                    
+                   
+                    if count1 == 0
+                        app.numofones.Value = '0';
+                        app.numofones.FontSize = 20; % Font boyutunu 16 olarak ayarla
+                        app.numofones.FontColor = 'black';
+                    else
+                        app.numofones.Value = num2str(count1);
+                        app.numofones.FontSize = 20; % Font boyutunu 16 olarak ayarla
+                        app.numofones.FontColor = 'black';
+                    end
+                    
+                    if count2 == 0
+                        app.numOfhalf.Value = '0';
+                        app.numOfhalf.FontSize = 20; % Font boyutunu 16 olarak ayarla
+                        app.numOfhalf.FontColor = 'black';
+                    else
+                        app.numOfhalf.Value = num2str(count2);
+                        app.numOfhalf.FontSize = 20; % Font boyutunu 16 olarak ayarla
+                        app.numOfhalf.FontColor = 'black';
+                    end
+                    
+                    if count3 == 0
+                        app.numOfquart.Value = '0';
+                        app.numOfquart.FontSize = 20; % Font boyutunu
+                        app.numOfquart.FontColor = 'black';
+                    else
+                        app.numOfquart.Value = num2str(count3);
+                        app.numOfquart.FontSize = 20; % Font boyutunu
+                        app.numOfquart.FontColor = 'black';
+                    end
+                    
+                    if count4 == 0
+                        app.numOfon.Value = '0';
+                        app.numOfon.FontSize = 20; % Font boyutunu 16 olarak ayarla
+                        app.numOfon.FontColor = 'black';
+                    else
+                        app.numOfon.Value = num2str(count4);
+                        app.numOfon.FontSize = 20; % Font boyutunu 16 olarak ayarla
+                        app.numOfon.FontColor = 'black';
+                    end
+                    
+                    if count5 == 0
+                        app.numOfbes.Value = '0';
+                        app.numOfbes.FontSize = 20; % Font boyutunu 16 olarak ayarla
+                        app.numOfbes.FontColor = 'black';
+                    else
+                        app.numOfbes.Value = num2str(count5);
+                        app.numOfbes.FontSize = 20; % Font boyutunu 16 olarak ayarla
+                        app.numOfbes.FontColor = 'black';
+                    end
+                    
+                    
+                    app.totalMoney.Value = strcat('₺', num2str(total_money)); % ekrana yansıtma
+                   % Örneğin, Label bileşenin adı 'totalMoney' olarak varsayalım.
+                    
+                    app.totalMoney.FontSize = 25; % Font boyutunu 16 olarak ayarla
+
+
+
+
+
+                    fprintf('Total value: %.2f TL\n', total_money);
+                
+                    % Create a figure for the annotated image
+                    axes(app.UIAxes_3)
+                    imshow(img_erode, 'Parent', app.UIAxes_3);
+                    
+
+                    hold(app.UIAxes_3, 'on');
+                    
+                    % Iterate over each circle and annotate with its value
+                    for i = 1:length(sorted_areas)
+                        centerX = sorted_centers(i, 1);
+                        centerY = sorted_centers(i, 2);
+                        radius = sorted_radii(i);
+                        coin_value = 0;
+                    
+                        if (scaled_factors(i) == 1) || (scaled_factors(i) > 0.91)
+                            coin_value = 1;
+                        elseif ((0.77 < scaled_factors(i)) && (scaled_factors(i) <= 0.91))
+                            coin_value = 0.5;
+                        elseif ((0.67 < scaled_factors(i)) && (scaled_factors(i) <= 0.77))
+                            coin_value = 0.25;
+                        elseif ((0.5951 < scaled_factors(i)) && (scaled_factors(i) <= 0.67))
+                            coin_value = 0.10;
+                        elseif ((0 < scaled_factors(i)) && (scaled_factors(i) <= 0.5951))
+                            coin_value = 0.05;
+                        end
+                    
+                        % Annotate the value on the image
+                        text(app.UIAxes_3, centerX, centerY, sprintf('%.2f TL', coin_value), ...
+                            'Color', 'r', 'FontSize', 5, 'HorizontalAlignment', 'center');
+                    
+                        % Draw the circle for visualization
+                        theta = linspace(0, 2*pi, 100);
+                        x = centerX + radius * cos(theta);
+                        y = centerY + radius * sin(theta);
+                        plot(app.UIAxes_3, x, y, 'g', 'LineWidth', 1);
+                    end
+                    
+                    hold(app.UIAxes_3, 'off');
+        end
+
+        % Callback function
+        function TOTALMONEYEditFieldValueChanged(app, event)
+            total_money = app.TOTALMONEYEditField.Value;
+        end
+
+        % Callback function
+        function TOTALMONEYEditFieldValueChanging(app, event)
+            % total_money = event.Value;
+            
+        end
+
+        % Callback function
+        function TOTALMONEYEditFieldValueChanged2(app, event)
+            % total_money = app.TOTALMONEYEditField.Value;
+            
+        end
+
+        % Callback function
+        function totalMoneyValueChanged(app, event)
+            value = app.totalMoney.Value;
+            
+        end
+
+        % Button pushed function: ExitButton
+        function ExitButtonPushed(app, event)
+            close(app.UIFigure);
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Color = [0.1961 0.1961 0.3216];
+            app.UIFigure.Position = [100 100 1086 752];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create UIAxes_2
+            app.UIAxes_2 = uiaxes(app.UIFigure);
+            app.UIAxes_2.Colormap = [];
+            app.UIAxes_2.XTick = [];
+            app.UIAxes_2.YTick = [];
+            app.UIAxes_2.Visible = 'off';
+            app.UIAxes_2.Position = [460 42 607 604];
+
+            % Create UIAxes_3
+            app.UIAxes_3 = uiaxes(app.UIFigure);
+            app.UIAxes_3.Colormap = [];
+            app.UIAxes_3.XTick = [];
+            app.UIAxes_3.YTick = [];
+            app.UIAxes_3.Visible = 'off';
+            app.UIAxes_3.Position = [460 42 607 607];
+
+            % Create Panel
+            app.Panel = uipanel(app.UIFigure);
+            app.Panel.BackgroundColor = [0.549 0.549 0.6706];
+            app.Panel.Position = [60 648 374 80];
+
+            % Create TotalMoneyLabel
+            app.TotalMoneyLabel = uilabel(app.Panel);
+            app.TotalMoneyLabel.HorizontalAlignment = 'right';
+            app.TotalMoneyLabel.FontSize = 30;
+            app.TotalMoneyLabel.FontWeight = 'bold';
+            app.TotalMoneyLabel.FontColor = [1 1 1];
+            app.TotalMoneyLabel.Position = [15 21 178 39];
+            app.TotalMoneyLabel.Text = 'Total Money';
+
+            % Create totalMoney
+            app.totalMoney = uitextarea(app.Panel);
+            app.totalMoney.Editable = 'off';
+            app.totalMoney.Position = [208 17 150 42];
+
+            % Create COINCALCULATORLabel
+            app.COINCALCULATORLabel = uilabel(app.UIFigure);
+            app.COINCALCULATORLabel.HorizontalAlignment = 'center';
+            app.COINCALCULATORLabel.FontSize = 48;
+            app.COINCALCULATORLabel.FontWeight = 'bold';
+            app.COINCALCULATORLabel.FontAngle = 'italic';
+            app.COINCALCULATORLabel.FontColor = [1 1 1];
+            app.COINCALCULATORLabel.Position = [522 645 490 89];
+            app.COINCALCULATORLabel.Text = 'COIN CALCULATOR ';
+
+            % Create NumberofthecoinsPanel
+            app.NumberofthecoinsPanel = uipanel(app.UIFigure);
+            app.NumberofthecoinsPanel.ForegroundColor = [1 1 1];
+            app.NumberofthecoinsPanel.TitlePosition = 'centertop';
+            app.NumberofthecoinsPanel.Title = 'Number of the coins';
+            app.NumberofthecoinsPanel.BackgroundColor = [0.549 0.549 0.6706];
+            app.NumberofthecoinsPanel.FontAngle = 'italic';
+            app.NumberofthecoinsPanel.FontWeight = 'bold';
+            app.NumberofthecoinsPanel.FontSize = 24;
+            app.NumberofthecoinsPanel.Position = [60 355 374 263];
+
+            % Create tlLabel
+            app.tlLabel = uilabel(app.NumberofthecoinsPanel);
+            app.tlLabel.HorizontalAlignment = 'right';
+            app.tlLabel.FontSize = 18;
+            app.tlLabel.FontWeight = 'bold';
+            app.tlLabel.FontColor = [1 1 1];
+            app.tlLabel.Position = [12 195 137 23];
+            app.tlLabel.Text = 'Number of 1 TL';
+
+            % Create numofones
+            app.numofones = uitextarea(app.NumberofthecoinsPanel);
+            app.numofones.Editable = 'off';
+            app.numofones.FontColor = [1 1 1];
+            app.numofones.Position = [194 187 150 35];
+
+            % Create krLabel
+            app.krLabel = uilabel(app.NumberofthecoinsPanel);
+            app.krLabel.HorizontalAlignment = 'right';
+            app.krLabel.FontSize = 18;
+            app.krLabel.FontWeight = 'bold';
+            app.krLabel.FontColor = [1 1 1];
+            app.krLabel.Position = [12 152 152 23];
+            app.krLabel.Text = 'Number of 0.5 TL';
+
+            % Create numOfhalf
+            app.numOfhalf = uitextarea(app.NumberofthecoinsPanel);
+            app.numOfhalf.Editable = 'off';
+            app.numOfhalf.FontColor = [1 1 1];
+            app.numOfhalf.Position = [194 143 150 35];
+
+            % Create krLabel_5
+            app.krLabel_5 = uilabel(app.NumberofthecoinsPanel);
+            app.krLabel_5.HorizontalAlignment = 'right';
+            app.krLabel_5.FontSize = 18;
+            app.krLabel_5.FontWeight = 'bold';
+            app.krLabel_5.FontColor = [1 1 1];
+            app.krLabel_5.Position = [12 109 162 23];
+            app.krLabel_5.Text = 'Number of 0.25 TL';
+
+            % Create numOfquart
+            app.numOfquart = uitextarea(app.NumberofthecoinsPanel);
+            app.numOfquart.Editable = 'off';
+            app.numOfquart.FontColor = [1 1 1];
+            app.numOfquart.Position = [194 99 150 35];
+
+            % Create krLabel_6
+            app.krLabel_6 = uilabel(app.NumberofthecoinsPanel);
+            app.krLabel_6.FontSize = 18;
+            app.krLabel_6.FontWeight = 'bold';
+            app.krLabel_6.FontColor = [1 1 1];
+            app.krLabel_6.Position = [15 64 162 23];
+            app.krLabel_6.Text = 'Number of 0.10 TL';
+
+            % Create numOfon
+            app.numOfon = uitextarea(app.NumberofthecoinsPanel);
+            app.numOfon.Editable = 'off';
+            app.numOfon.FontColor = [1 1 1];
+            app.numOfon.Position = [196 55 148 35];
+
+            % Create krLabel_7
+            app.krLabel_7 = uilabel(app.NumberofthecoinsPanel);
+            app.krLabel_7.HorizontalAlignment = 'right';
+            app.krLabel_7.FontSize = 18;
+            app.krLabel_7.FontWeight = 'bold';
+            app.krLabel_7.FontColor = [1 1 1];
+            app.krLabel_7.Position = [12 20 162 23];
+            app.krLabel_7.Text = 'Number of 0.05 TL';
+
+            % Create numOfbes
+            app.numOfbes = uitextarea(app.NumberofthecoinsPanel);
+            app.numOfbes.Editable = 'off';
+            app.numOfbes.FontColor = [1 1 1];
+            app.numOfbes.Position = [195 11 148 35];
+
+            % Create OPTIONSPanel
+            app.OPTIONSPanel = uipanel(app.UIFigure);
+            app.OPTIONSPanel.ForegroundColor = [1 1 1];
+            app.OPTIONSPanel.TitlePosition = 'centertop';
+            app.OPTIONSPanel.Title = 'OPTIONS';
+            app.OPTIONSPanel.BackgroundColor = [0.549 0.549 0.6706];
+            app.OPTIONSPanel.FontAngle = 'italic';
+            app.OPTIONSPanel.FontWeight = 'bold';
+            app.OPTIONSPanel.FontSize = 24;
+            app.OPTIONSPanel.Position = [60 42 374 283];
+
+            % Create AddanimageButton
+            app.AddanimageButton = uibutton(app.OPTIONSPanel, 'push');
+            app.AddanimageButton.ButtonPushedFcn = createCallbackFcn(app, @AddanimageButtonPushed, true);
+            app.AddanimageButton.BackgroundColor = [1 1 1];
+            app.AddanimageButton.FontSize = 14;
+            app.AddanimageButton.FontWeight = 'bold';
+            app.AddanimageButton.Position = [82 190 211 46];
+            app.AddanimageButton.Text = 'Add an image';
+
+            % Create PreprocessingButton
+            app.PreprocessingButton = uibutton(app.OPTIONSPanel, 'push');
+            app.PreprocessingButton.ButtonPushedFcn = createCallbackFcn(app, @PreprocessingButtonPushed, true);
+            app.PreprocessingButton.FontSize = 14;
+            app.PreprocessingButton.FontWeight = 'bold';
+            app.PreprocessingButton.Position = [82 131 211 46];
+            app.PreprocessingButton.Text = 'Preprocessing';
+
+            % Create CalculateButton
+            app.CalculateButton = uibutton(app.OPTIONSPanel, 'push');
+            app.CalculateButton.ButtonPushedFcn = createCallbackFcn(app, @CalculateButtonPushed, true);
+            app.CalculateButton.FontSize = 14;
+            app.CalculateButton.FontWeight = 'bold';
+            app.CalculateButton.Position = [82 72 211 46];
+            app.CalculateButton.Text = 'Calculate';
+
+            % Create ExitButton
+            app.ExitButton = uibutton(app.OPTIONSPanel, 'push');
+            app.ExitButton.ButtonPushedFcn = createCallbackFcn(app, @ExitButtonPushed, true);
+            app.ExitButton.FontSize = 14;
+            app.ExitButton.FontWeight = 'bold';
+            app.ExitButton.Position = [82 13 211 46];
+            app.ExitButton.Text = 'Exit';
+
+            % Create ContextMenu
+            app.ContextMenu = uicontextmenu(app.UIFigure);
+
+            % Create Menu
+            app.Menu = uimenu(app.ContextMenu);
+            app.Menu.Text = 'Menu';
+
+            % Create Menu2
+            app.Menu2 = uimenu(app.ContextMenu);
+            app.Menu2.Text = 'Menu2';
+            
+            % Assign app.ContextMenu
+            app.numOfhalf.ContextMenu = app.ContextMenu;
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = ahmetProje
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
